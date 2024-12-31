@@ -1,0 +1,127 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+  <div class="flex flex-col gap-2 h-full items-center justify-center">
+
+    <div class="mb-4">
+      <table class="w-full table-auto border-collapse border border-gray-200 rounded-lg shadow-md">
+        <tbody>
+          <tr id="connected-account" class="hidden">
+            <td class="px-4 py-2 border border-gray-200 font-semibold bg-gray-100">Connected Account</td>
+            <td class="px-4 py-2 border border-gray-200">
+              <span id="connected-account-text"></span>
+            </td>
+          </tr>
+          <tr id="memo-to-send" class="hidden">
+            <td class="px-4 py-2 border border-gray-200 font-semibold bg-gray-100">Memo To Send</td>
+            <td class="px-4 py-2 border border-gray-200">
+              <span id="memo-to-send-text"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+
+    <div class="flex justify-center items-center gap-4">
+      <button
+        class="w-fit bg-gradient-to-r from-yellow-500 to-orange-400 text-white px-3 py-2 rounded-md font-semibold transition-all duration-300 hover:shadow-sm hover:text-yellow-700 shadow-md focus:outline-none"
+        id="connect-button"
+      >
+        <div class="flex gap-1.5">
+          <img src="metamask-logo.png" alt="metamask logo icon" width="24" />
+          <div id="connect-btn-text">Connect MetaMask</div>
+        </div>
+      </button>
+    
+      <button
+        class="w-fit bg-gradient-to-r from-blue-500 to-indigo-400 text-white px-3 py-2 rounded-md font-semibold transition-all duration-300 hover:shadow-sm shadow-md hover:text-indigo-900 focus:outline-none hidden"
+        id="send-button"
+      >
+        <div class="flex gap-1.5">
+          <img src="send-message-icon.png" alt="send message icon" width="24">
+          Send Message
+        </div>
+      </button>
+    </div>
+
+  </div>
+  
+
+  <div class="absolute bg-gradient-to-tr from-white to-orange-50 opacity-50 inset-0 z-[-1]"></div>
+
+
+  <script>
+    const connectBtn = document.getElementById('connect-button');
+    const sendBtn = document.getElementById('send-button');
+    const connectBtnText = document.getElementById('connect-btn-text');
+    const connectedAccount = document.getElementById('connected-account');
+    const connectedAccountText = document.getElementById('connected-account-text');
+    const memoToSend = document.getElementById('memo-to-send');
+    const memoToSendText = document.getElementById('memo-to-send-text');
+
+    let account;
+
+    connectBtn.addEventListener('click', event => {
+      const button = event.target;
+      ethereum.request({ method: 'eth_requestAccounts'}).then(accounts => {
+        account = accounts[0]
+
+        connectBtn.classList.remove('hover:shadow-sm', 'hover:text-yellow-700');
+        connectBtn.classList.add('cursor-not-allowed')
+        connectBtn.disabled = true;
+
+        connectBtnText.textContent = 'Connected!';
+
+        connectedAccount.classList.remove('hidden');
+        connectedAccountText.textContent = account;
+
+        memoToSend.classList.remove('hidden');
+        memoToSendText.textContent = 'b5155641a7609adce28438beda73275dc4c294cddc4f3f105cbacf024f9e842c';
+
+        sendBtn.classList.remove('hidden');
+
+        ethereum.request({ method: 'eth_getBalance', params: [account, 'latest'] }).then(result => {
+          const wei = parseInt(result, 16);
+          const balance = wei / (Math.pow(10, 18))
+        })
+      })
+    })
+
+    sendBtn.addEventListener('click', event => {
+      const transactionParams = {
+        to: '0x29a9225d38de0837d8368BB7AB42D5Cc73900C28',
+        from: account,
+        value: '0x0',
+        data: memoToSendText.textContent
+      };
+
+      ethereum.request({ method: 'eth_sendTransaction', params: [transactionParams] }).then(txhash => {
+        console.log(txhash)
+        checkTransactionConfirmation(txhash).then(r => alert(r));
+      })
+    })
+
+    function checkTransactionConfirmation(txhash) {
+      const checkTransactionLoop = () => {
+        return ethereum.request({ method: 'eth_getTransactionReceipt', params: [txhash] }).then(r => {
+          if (r != null) return 'confirmed';
+          else return checkTransactionLoop();
+        })
+      }
+
+      return checkTransactionLoop();
+    }
+
+    function stringToHex(str) {
+      return '0x' + Buffer.from(str, 'utf8').toString('hex');
+    }
+  </script>
+</body>
+</html>
