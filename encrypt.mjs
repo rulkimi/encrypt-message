@@ -36,7 +36,6 @@ await (async () => {
   const ciphertextHex = sodium.to_hex(ciphertext);
   const nonceHex = sodium.to_hex(nonce);
   const publicKeyHex = sodium.to_hex(publicKey);
-  console.log(publicKeyHex)
   const privateKeyHex = sodium.to_hex(privateKey)
 
   const details = {
