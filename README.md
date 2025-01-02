@@ -27,10 +27,6 @@ This README provides steps to execute the web3 and Libsodium-based assessment ta
    ```bash
    node encrypt.mjs
    ```
-   Outputs:
-   - Encrypted message
-   - Nonce
-   - Public key
 4. Verify encryption:
    ```bash
    node check.mjs
