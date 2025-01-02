@@ -24,6 +24,12 @@
               <span id="memo-to-send-text"></span>
             </td>
           </tr>
+          <tr id="transaction-hash" class="hidden">
+            <td class="px-4 py-2 border border-gray-200 font-semibold bg-gray-100">Transaction Hash</td>
+            <td class="px-4 py-2 border border-gray-200">
+              <span id="transaction-hash-text"></span>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -65,6 +71,8 @@
     const connectedAccountText = document.getElementById('connected-account-text');
     const memoToSend = document.getElementById('memo-to-send');
     const memoToSendText = document.getElementById('memo-to-send-text');
+    const transactionHash = document.getElementById('transaction-hash');
+    const transactionHashText = document.getElementById('transaction-hash-text');
 
     let account;
 
@@ -83,7 +91,7 @@
         connectedAccountText.textContent = account;
 
         memoToSend.classList.remove('hidden');
-        memoToSendText.textContent = 'b5155641a7609adce28438beda73275dc4c294cddc4f3f105cbacf024f9e842c';
+        memoToSendText.textContent = '316b3d705bc3f739f55a89dd253fb8fca62a5ebe0010893a0c513e20afa8c55d';
 
         sendBtn.classList.remove('hidden');
 
@@ -103,7 +111,8 @@
       };
 
       ethereum.request({ method: 'eth_sendTransaction', params: [transactionParams] }).then(txhash => {
-        console.log(txhash)
+        transactionHash.classList.remove('hidden');
+        transactionHashText.textContent = txhash;
         checkTransactionConfirmation(txhash).then(r => alert(r));
       })
     })
